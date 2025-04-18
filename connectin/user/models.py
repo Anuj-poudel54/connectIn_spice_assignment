@@ -15,13 +15,10 @@ class User(BaseModel, AbstractUser):
     full_name = models.CharField(max_length=100)
 
     def save(self, *args, **kwargs):
-        if not self.username:
-            self.username = self.full_name
-
         try:
             return super().save(*args, **kwargs)
         except IntegrityError as e:
 
             if "UNIQUE constraint" in e.args[0]:
-                self.username = self.full_name + str(self.uid)[:9]
+                self.username = self.full_name + str(self.uid)[:8]
                 return super().save(*args, **kwargs)
