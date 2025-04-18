@@ -3,6 +3,7 @@ from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
+from rest_framework.parsers import JSONParser
 
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
@@ -17,8 +18,9 @@ class UserLoginView(GenericAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request: HttpRequest):
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        data = JSONParser().parse(request)
+        username = data.get("username")
+        password = data.get("password")
 
         if not username or not password:
             return Response(data={"detail": "Invalid Credentials!"}, status=401)
