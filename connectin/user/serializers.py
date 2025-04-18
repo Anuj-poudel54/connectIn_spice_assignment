@@ -4,9 +4,14 @@ from .models import User
 from django.core.validators import RegexValidator
 
 class UserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True,style={'input_type': 'password'})
     class Meta:
         model = User
-        fields = ['uid', 'full_name', 'email', 'contact_number', 'address', 'industry', 'company_name']
+        fields = ['uid', 'full_name', 'email', 'contact_number', 'address', 'industry', 'company_name', 'password']
+    
+    def create(self, validated_data: dict):
+        user = User.objects.create_user(username=validated_data['full_name'], **validated_data)
+        return user
 
     def validate_contact_number(self, value: str):
         pattern = r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,7}$'
