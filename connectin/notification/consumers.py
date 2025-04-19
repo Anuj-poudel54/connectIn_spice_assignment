@@ -1,6 +1,7 @@
 import json
 
 from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
 
 from django.contrib.auth.models import AnonymousUser
 
@@ -12,13 +13,14 @@ class NotificationConsumer(WebsocketConsumer):
             self.close()
             return
         
-        self.channel_name = user.username
+        self.room_name = user.username
+        async_to_sync(self.channel_layer.group_add)(self.room_name, self.channel_name)
 
         self.accept()
-        self.send("Connected!")
+        self.send(f"Connected with channel name {self.room_name}!")
 
     def disconnect(self, close_code):
-        pass
+        async_to_sync(self.channel_layer.group_discard)(self.room_name, self.channel_name)
 
     def receive(self, text_data):
         ...
