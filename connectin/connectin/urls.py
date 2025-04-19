@@ -7,6 +7,7 @@ urlpatterns = [
 
     path('api/user/', include('user.urls')),
     path('api/connection/', include('connection.urls')),
+    path('api/notification/', include('notification.urls')),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
