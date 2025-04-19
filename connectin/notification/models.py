@@ -9,4 +9,6 @@ UserModel = get_user_model()
 class Notification(BaseModel):
     user = models.ForeignKey(UserModel, related_name='notifications', on_delete=models.CASCADE)
     body = models.TextField()
-    notified = models.BooleanField(default = False)
+
+    def notify_user(self):
+        ...
