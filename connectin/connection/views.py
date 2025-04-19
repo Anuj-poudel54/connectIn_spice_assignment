@@ -27,12 +27,12 @@ class ConnectionApiView(ViewSet):
 
         if connection_ser.is_valid():
             connection_ser.save()
-            message = f"Connection sent to {to_user.first().username}!"
+            message = f"You sent connection request sent to {to_user.first().username}!"
             
             Notification.objects.create(body=message, user=request.user)
 
             # Creating and sending notification to connection request receiver
-            notification = Notification(body=f"{request.user.username} sent you connection request!", user=request.user)
+            notification = Notification(body=f"{request.user.username} sent you connection request!", user=to_user.first())
             notification.save()
             notification.notify_user()
             
