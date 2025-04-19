@@ -1,7 +1,6 @@
 
-from django.urls import path, include
+from django.urls import path
 
-from rest_framework.routers import DefaultRouter
 
 from .views import ConnectionApiView
 
@@ -9,6 +8,7 @@ from .views import ConnectionApiView
 urlpatterns = ([
     path('send/', ConnectionApiView.as_view({"post": "send_connection"}), name='send-connection-request'),
     path('decide/', ConnectionApiView.as_view({"post": "decide_connection"}), name='decide-connection-request'),
-    path('list/<uuid:user_id>/', ConnectionApiView.as_view({"get": "list_by_user"}), name='decide-connection-request'),
+    path('requests/', ConnectionApiView.as_view({"get": "list_request"}), name='list-connection-requests'),
+    path('sent-requests/', ConnectionApiView.as_view({"get": "list_sent_request"}), name='list-sent-connection-requests'),
 ])
 
