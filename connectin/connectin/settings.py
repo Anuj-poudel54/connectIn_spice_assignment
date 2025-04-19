@@ -15,12 +15,13 @@ SECRET_KEY = 'django-insecure-v+4amv3#&mc#o9!)w5v*@*fvo#!-3gowwm=w!^$jdfw4cyl&4!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,7 +62,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'connectin.wsgi.application'
+# WSGI_APPLICATION = 'connectin.wsgi.application'
+ASGI_APPLICATION = 'connectin.asgi.application'
+
 
 
 # Database
@@ -139,3 +142,11 @@ SIMPLE_JWT = {
 
 # Celery configs
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
