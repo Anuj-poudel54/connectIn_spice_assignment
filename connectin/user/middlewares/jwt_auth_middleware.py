@@ -1,7 +1,6 @@
 
 from channels.db import database_sync_to_async
 from rest_framework_simplejwt.tokens import UntypedToken
-from rest_framework_simplejwt.exceptions import ExpiredTokenError, InvalidToken
 from jwt import decode as jwt_decode
 
 from django.contrib.auth import get_user_model
@@ -18,7 +17,7 @@ def get_user(user_id):
         return AnonymousUser()
 
 class JwtAuthMiddleware:
-   
+   """ Auth middleware used in websocket for authenticating using jwt """
    
    def __init__(self, app):
         self.app = app
@@ -37,6 +36,7 @@ class JwtAuthMiddleware:
         if name.lower() != "bearer":
             raise ValueError(f"Invalid token name {name}")
         
+        # Validating jwt and getting user id to get user instance
         try:
             UntypedToken(token)
             decoded_data = jwt_decode(token.encode(), settings.SECRET_KEY, algorithms=["HS256"])
