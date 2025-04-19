@@ -136,3 +136,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "USER_ID_FIELD": "uid",
 }
+
+# Celery configs
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
