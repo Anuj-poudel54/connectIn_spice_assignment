@@ -4,6 +4,7 @@ from rest_framework.parsers import JSONParser
 
 from .serializer import ConnectionSerializer, ConnectionListSerializer
 from .models import Connection
+from notification.models import Notification
 
 from django.http import HttpRequest
 from django.contrib.auth import get_user_model
@@ -17,7 +18,8 @@ class ConnectionApiView(ViewSet):
         req_data = JSONParser().parse(request)
         to_user_id = req_data.get("to_user_id")
 
-        if not UserModel.objects.filter(uid=to_user_id).exists():
+        to_user = UserModel.objects.filter(uid=to_user_id)
+        if not to_user.exists():
             return Response(data={"detail": "User not found!"}, status=404)
 
         data['to_user'] = to_user_id
@@ -25,7 +27,16 @@ class ConnectionApiView(ViewSet):
 
         if connection_ser.is_valid():
             connection_ser.save()
-            return Response(data={"detail": "Connection sent!"}, status=200)
+            message = f"Connection sent to {to_user.first().username}!"
+            
+            Notification.objects.create(body=message, user=request.user)
+
+            # Creating and sending notification to connection request receiver
+            notification = Notification(body=f"{request.user.username} sent you connection request!", user=request.user)
+            notification.save()
+            notification.notify_user()
+            
+            return Response(data={"detail": message}, status=200)
 
         return Response(data=connection_ser.errors, status=422)
     
@@ -58,9 +69,15 @@ class ConnectionApiView(ViewSet):
             if choice == "accept":
                 connection_request.accepted = True
                 connection_request.save()
+                
+                notif = Notification.objects.create( body=f"{connection_request.to_user.username} accepted your connection request!", user=connection_request.from_user)
+                notif.notify_user()
 
             elif choice == "reject":
                 connection_request.delete()
+                
+                notif = Notification.objects.create( body=f"{connection_request.to_user.username} rejected your connection request!", user=connection_request.from_user)
+                notif.notify_user()
 
         return Response(data={"detail": f"Connection {choice}ed!"}, status=200)
 
