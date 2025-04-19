@@ -64,16 +64,24 @@ class ConnectionApiView(ViewSet):
 
         return Response(data={"detail": f"Connection {choice}ed!"}, status=200)
 
-    def list_by_user(self, request: HttpRequest, user_id: str):
-        if not user_id:
-            return Response({"detail": "Please provide user id!"}, status=401)
+    def list_request(self, request: HttpRequest):
 
-        user = UserModel.objects.filter(pk=user_id)
-        if not user.exists():
+        user = request.user
+        if user.is_authenticated or user.is_anonymous:
             return Response(data={"detail": "User does not exist!"}, status=404)
 
         received_requests = user.first().received_requests.all()
         data = ConnectionListSerializer(received_requests, many=True).data
+        return Response(data=data, status=200)
+    
+    def list_sent_request(self, request: HttpRequest):
+
+        user = request.user
+        if user.is_authenticated or user.is_anonymous:
+            return Response(data={"detail": "User does not exist!"}, status=404)
+
+        sent_requests = user.first().sent_requests.all()
+        data = ConnectionListSerializer(sent_requests, many=True).data
         return Response(data=data, status=200)
 
 
