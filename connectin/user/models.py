@@ -9,7 +9,7 @@ from utils.models import BaseModel
 class User(BaseModel, AbstractUser):
     address = models.TextField()
     industry = models.CharField(max_length=50)
-    email = models.EmailField(blank=True, unique=True)
+    email = models.EmailField(blank=True, null=True, unique=True)
     company_name = models.CharField(max_length=100)
     contact_number = models.CharField(max_length=15, unique=True)
     full_name = models.CharField(max_length=100)
