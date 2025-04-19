@@ -7,7 +7,7 @@ from asgiref.sync import async_to_sync
 def send_ws_notification(username: str, body: str):
     channel_layer = get_channel_layer()
     
-    async_to_sync(channel_layer.send)(
+    async_to_sync(channel_layer.group_send)(
         username,
         {
             "type": "notify",
