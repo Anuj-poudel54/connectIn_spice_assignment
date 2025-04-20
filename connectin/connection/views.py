@@ -54,7 +54,7 @@ class ConnectionApiView(ViewSet):
             return Response(data={"detail": "Connection request not found!"}, status=404)
         
         choice = req_data.get("do")
-        if not choice.strip():
+        if not choice.strip() and choice not in {'accept', 'reject', 'cancel'}:
             return Response(data={"detail": "Only accept, reject or cancel is allowed!"}, status=404)
 
 
@@ -74,16 +74,13 @@ class ConnectionApiView(ViewSet):
                 notif.notify_user()
                 return Response(data={"detail": "Connection request Accepted!"}, status=200)
 
-            elif choice == "reject":
+            elif choice == "reject" and not connection_request.accepted:
                 connection_request.delete()
                 
                 notif = Notification.objects.create( body=f"{connection_request.to_user.username} rejected your connection request!", user=connection_request.from_user)
                 notif.notify_user()
                 return Response(data={"detail": "Connection request rejected!"}, status=200)
             
-            else:
-                return Response(data={"detail": f"Only accept and reject are allowed!"}, status=401)
-        
         return Response(data={"detail": f"You are not authorized to perform this request!"}, status=401)
 
     def list_request(self, request: Request):
