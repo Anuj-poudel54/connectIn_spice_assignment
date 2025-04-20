@@ -3,10 +3,9 @@ from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from rest_framework.request import Request
 
 from django.contrib.auth import get_user_model
-from django.http import HttpRequest
 from django.contrib.auth import authenticate
 from django.db.models import Q
 
@@ -20,8 +19,8 @@ class UserLoginView(GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
 
-    def post(self, request: HttpRequest):
-        data = JSONParser().parse(request)
+    def post(self, request: Request):
+        data = request.data
         username = data.get("username")
         password = data.get("password")
 
@@ -55,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = UserModel.objects.all()
     serializer_class = UserSerializer
 
-    def search(self, request: HttpRequest):
+    def search(self, request: Request):
         name = request.GET.get("name")
         company_name = request.GET.get("company_name")
         email = request.GET.get("email")

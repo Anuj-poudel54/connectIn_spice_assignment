@@ -1,21 +1,20 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
-from rest_framework.parsers import JSONParser
+from rest_framework.request import Request
 
 from .serializer import ConnectionSerializer, ConnectionListSerializer
 from .models import Connection
 from notification.models import Notification
 
-from django.http import HttpRequest
 from django.contrib.auth import get_user_model
 
 UserModel = get_user_model()
 
 class ConnectionApiView(ViewSet):
 
-    def send_connection(self, request: HttpRequest):
+    def send_connection(self, request: Request):
         data = {"from_user": request.user.pk}
-        req_data = JSONParser().parse(request)
+        req_data = request.data
         to_user_id = req_data.get("to_user_id")
 
         to_user = UserModel.objects.filter(uid=to_user_id)
@@ -40,10 +39,10 @@ class ConnectionApiView(ViewSet):
 
         return Response(data=connection_ser.errors, status=422)
     
-    def decide_connection(self, request: HttpRequest):
+    def decide_connection(self, request: Request):
         """ Accpet, Reject or Cancel the connection request """
 
-        req_data = JSONParser().parse(request)
+        req_data = request.data
         connection_id = req_data.get("connection_id")
 
         if not connection_id:
@@ -87,7 +86,7 @@ class ConnectionApiView(ViewSet):
         
         return Response(data={"detail": f"You are not authorized to perform this request!"}, status=401)
 
-    def list_request(self, request: HttpRequest):
+    def list_request(self, request: Request):
 
         user = request.user
         if not user.is_authenticated or user.is_anonymous:
@@ -97,7 +96,7 @@ class ConnectionApiView(ViewSet):
         data = ConnectionListSerializer(received_requests, many=True).data
         return Response(data=data, status=200)
     
-    def list_sent_request(self, request: HttpRequest):
+    def list_sent_request(self, request: Request):
 
         user = request.user
         if not user.is_authenticated or user.is_anonymous:
@@ -106,14 +105,3 @@ class ConnectionApiView(ViewSet):
         sent_requests = user.sent_requests.all()
         data = ConnectionListSerializer(sent_requests, many=True).data
         return Response(data=data, status=200)
-
-
-"""
-/api/connection/send/
-
-/api/connection/decide/
-
-/api/connection/list/
-
-
-"""
