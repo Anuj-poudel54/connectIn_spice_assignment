@@ -1,16 +1,24 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.request import Request
 
 from .models import Notification
 from .serializer import NotificationSerializer
 
-from django.http import HttpRequest
 
-class NotificationApiView(APIView):
+class NotificationApiView(ModelViewSet):
 
-    def get(self, request: HttpRequest):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+    def create(self, request: Request, *args, **kwargs):
+
+        request.data['user'] = request.user.uid
+
+        return super().create(request, *args, **kwargs)
+
+    def list(self, request: Request, *args, **kwargs):
         user = request.user
-        all_notifs = Notification.objects.filter(user=user)
-        notifs_ser = NotificationSerializer(all_notifs, many=True)
-
-        return Response(data=notifs_ser.data, status=200)
+        self.queryset = self.get_queryset().filter(user=user)
+        return super().list(request, *args, **kwargs)
+        
+        
