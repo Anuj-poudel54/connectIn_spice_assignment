@@ -59,10 +59,11 @@ class ConnectionApiView(ViewSet):
             return Response(data={"detail": "Only accept, reject or cancel is allowed!"}, status=404)
 
 
-        if choice == "cancel":
+        if connection_request.from_user == request.user and choice == "cancel":
             # Only user who sent connection can cancel it
-            if connection_request.from_user == request.user:
-                connection_request.delete()
+            connection_request.delete()
+            return Response(data={"detail": "Connection request canceled!"}, status=200)
+
 
         # Only user who receives connection can accept or reject it
         if connection_request.to_user == request.user:
@@ -72,14 +73,19 @@ class ConnectionApiView(ViewSet):
                 
                 notif = Notification.objects.create( body=f"{connection_request.to_user.username} accepted your connection request!", user=connection_request.from_user)
                 notif.notify_user()
+                return Response(data={"detail": "Connection request Accepted!"}, status=200)
 
             elif choice == "reject":
                 connection_request.delete()
                 
                 notif = Notification.objects.create( body=f"{connection_request.to_user.username} rejected your connection request!", user=connection_request.from_user)
                 notif.notify_user()
-
-        return Response(data={"detail": f"Connection {choice}ed!"}, status=200)
+                return Response(data={"detail": "Connection request rejected!"}, status=200)
+            
+            else:
+                return Response(data={"detail": f"Only accept and reject are allowed!"}, status=401)
+        
+        return Response(data={"detail": f"You are not authorized to perform this request!"}, status=401)
 
     def list_request(self, request: HttpRequest):
 
