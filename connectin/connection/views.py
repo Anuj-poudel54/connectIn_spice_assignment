@@ -27,7 +27,7 @@ class ConnectionApiView(ViewSet):
 
         if connection_ser.is_valid():
             connection_ser.save()
-            message = f"You sent connection request sent to {to_user.first().username}!"
+            message = f"You sent connection request to {to_user.first().username}!"
             
             Notification.objects.create(body=message, user=request.user)
 
@@ -84,20 +84,20 @@ class ConnectionApiView(ViewSet):
     def list_request(self, request: HttpRequest):
 
         user = request.user
-        if user.is_authenticated or user.is_anonymous:
+        if not user.is_authenticated or user.is_anonymous:
             return Response(data={"detail": "User does not exist!"}, status=404)
 
-        received_requests = user.first().received_requests.all()
+        received_requests = user.received_requests.all()
         data = ConnectionListSerializer(received_requests, many=True).data
         return Response(data=data, status=200)
     
     def list_sent_request(self, request: HttpRequest):
 
         user = request.user
-        if user.is_authenticated or user.is_anonymous:
+        if not user.is_authenticated or user.is_anonymous:
             return Response(data={"detail": "User does not exist!"}, status=404)
 
-        sent_requests = user.first().sent_requests.all()
+        sent_requests = user.sent_requests.all()
         data = ConnectionListSerializer(sent_requests, many=True).data
         return Response(data=data, status=200)
 
