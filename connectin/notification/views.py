@@ -10,6 +10,10 @@ class NotificationApiView(ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
 
+    def update(self, request, *args, **kwargs):
+        request.data['user'] = request.user.uid
+        return super().update(request, *args, **kwargs)
+
     def create(self, request: Request, *args, **kwargs):
 
         request.data['user'] = request.user.uid
