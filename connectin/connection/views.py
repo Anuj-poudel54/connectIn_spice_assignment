@@ -24,6 +24,11 @@ class ConnectionApiView(ViewSet):
         data['to_user'] = to_user_id
         connection_ser = ConnectionSerializer(data=data)
 
+        # Checking if to_user has already sent connection request to from_user
+        if Connection.objects.filter(to_user__uid = data["from_user"], from_user__uid = data["to_user"]).exists():
+            return Response(data={"detail": "Unable to send conenction request!"}, status=400)
+
+
         if connection_ser.is_valid():
             connection_ser.save()
             message = f"You sent connection request to {to_user.first().username}!"
