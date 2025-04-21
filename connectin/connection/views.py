@@ -1,16 +1,20 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework.permissions import IsAuthenticated
 
 from .serializer import ConnectionSerializer, ConnectionListSerializer
 from .models import Connection
 from notification.models import Notification
 
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 UserModel = get_user_model()
 
 class ConnectionApiView(ViewSet):
+
+    permission_classes = (IsAuthenticated,)
 
     def send_connection(self, request: Request):
         data = {"from_user": request.user.pk}
@@ -91,8 +95,6 @@ class ConnectionApiView(ViewSet):
     def list_request(self, request: Request):
 
         user = request.user
-        if not user.is_authenticated or user.is_anonymous:
-            return Response(data={"detail": "User does not exist!"}, status=404)
 
         received_requests = user.received_requests.all().order_by('-created_at')
         data = ConnectionListSerializer(received_requests, many=True).data
@@ -101,9 +103,22 @@ class ConnectionApiView(ViewSet):
     def list_sent_request(self, request: Request):
 
         user = request.user
-        if not user.is_authenticated or user.is_anonymous:
-            return Response(data={"detail": "User does not exist!"}, status=404)
 
         sent_requests = user.sent_requests.all().order_by('-created_at')
         data = ConnectionListSerializer(sent_requests, many=True).data
         return Response(data=data, status=200)
+
+    def list_connections(self, request: Request):
+
+        user = request.user
+
+        connections = Connection.objects.filter( Q(from_user=user) | Q(to_user=user) & Q( accepted=True ) )
+
+        if not connections.exists():
+            return Response(data={"detail": "No connections found!"}, status=404)
+
+
+        connection_ser = ConnectionSerializer(connections, many=True)
+
+        return Response(data=connection_ser.data, status=200)
+
