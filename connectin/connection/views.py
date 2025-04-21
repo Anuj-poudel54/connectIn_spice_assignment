@@ -94,7 +94,7 @@ class ConnectionApiView(ViewSet):
         if not user.is_authenticated or user.is_anonymous:
             return Response(data={"detail": "User does not exist!"}, status=404)
 
-        received_requests = user.received_requests.all()
+        received_requests = user.received_requests.all().order_by('-created_at')
         data = ConnectionListSerializer(received_requests, many=True).data
         return Response(data=data, status=200)
     
@@ -104,6 +104,6 @@ class ConnectionApiView(ViewSet):
         if not user.is_authenticated or user.is_anonymous:
             return Response(data={"detail": "User does not exist!"}, status=404)
 
-        sent_requests = user.sent_requests.all()
+        sent_requests = user.sent_requests.all().order_by('-created_at')
         data = ConnectionListSerializer(sent_requests, many=True).data
         return Response(data=data, status=200)
