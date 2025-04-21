@@ -111,8 +111,9 @@ class ConnectionApiView(ViewSet):
     def list_connections(self, request: Request):
 
         user = request.user
+        print("USER:::", user)
 
-        connections = Connection.objects.filter( Q(from_user=user) | Q(to_user=user) & Q( accepted=True ) )
+        connections = Connection.objects.filter( (Q(from_user=user) | Q(to_user=user)) & Q( accepted=True ) )
 
         if not connections.exists():
             return Response(data={"detail": "No connections found!"}, status=404)
