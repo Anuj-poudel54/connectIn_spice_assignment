@@ -116,6 +116,7 @@ Token \<token\>
 }
 ```
 ---
+
 **Decide Connection Request**
 
 POST /api/connection/decide/
@@ -137,6 +138,16 @@ Token \<token\>
 - *cancel* to cancel the connection by sender
 
 ---
+**List all Connections**
+
+GET /api/connection/accepted/
+
+**Authorization** Bearer Token
+
+Token \<token\>
+
+---
+
 **List Connection Request**
 
 GET /api/connection/requests/
