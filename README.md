@@ -25,6 +25,33 @@ $ celery -A connectin worker -l info
 
 ## API Documentation
 
+
+## Real time notification
+
+It uses websocket for sending realtime notification.
+
+WebSocket /ws/notifs/
+
+**Authorizaion** Bearer Token
+
+Token \<token\>
+
+**Received message format**
+
+```Json
+{
+    "type": "",
+    "message": ""
+}
+```
+**Example**
+```Json
+{
+    "type": "notif",
+    "message": "john sent you connection request!"
+}
+```
+
 ## User
 
 **Register User**
@@ -221,31 +248,5 @@ Token \<token\>
 ```JSON
 {
     "body":""
-}
-```
-
-## Real time notification
-
-It uses websocket for sending realtime update.
-
-WS /ws/notifs/
-
-**Authorizaion** Bearer Token
-
-Token \<token\>
-
-**Received message format**
-
-```Json
-{
-    "type": "",
-    "message": ""
-}
-```
-**Example**
-```Json
-{
-    "type": "notif",
-    "message": "john sent you connection request!"
 }
 ```
