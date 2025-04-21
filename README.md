@@ -1,5 +1,7 @@
 # Connectin | Spice Assignmet
 
+- [API Documentation](#api-documentation)
+
 ## How to run project ?
 
 **Install redis and run it before running the project**
@@ -21,7 +23,7 @@ $ python3 manage.py runserver
 $ celery -A connectin worker -l info
 ```
 
-# API Documentation
+## API Documentation
 
 ## User
 
